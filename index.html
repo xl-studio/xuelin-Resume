@@ -1,0 +1,846 @@
+<html><head><meta charset="utf-8"><style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --ink: #111111;
+    --ink-soft: #3c3c3c;
+    --gray: #767676;
+    --gray-light: #a5a5a5;
+    --line: #e9e7e3;
+    --line-2: #d5d2cc;
+    --paper: #ffffff;
+    --sans: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    --mono: "SFMono-Regular", Menlo, Consolas, "Courier New", "PingFang SC", monospace;
+  }
+
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.3;
+    overflow-x: hidden;
+  }
+
+  /* ================= 01 封面：完全居中、零装饰 ================= */
+  .cover {
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: var(--paper);
+    padding: 40px 24px;
+  }
+  .cover-name {
+    font-size: clamp(46px, 6vw, 86px);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: 0.36em;
+    text-indent: 0.36em;
+    color: var(--ink);
+  }
+  .cover-sub {
+    margin-top: clamp(20px, 3.2vh, 34px);
+    font-family: var(--mono);
+    font-size: clamp(12px, 1.05vw, 15px);
+    letter-spacing: 0.44em;
+    text-indent: 0.44em;
+    text-transform: uppercase;
+    color: var(--gray);
+  }
+  .cover-note {
+    margin-top: clamp(16px, 2.4vh, 28px);
+    font-size: clamp(12px, 1vw, 14px);
+    letter-spacing: 0.3em;
+    text-indent: 0.3em;
+    color: var(--gray-light);
+  }
+
+  /* ================= 通用版式 ================= */
+  .slide {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(56px, 7vh, 92px) clamp(24px, 6vw, 88px);
+  }
+  .wrap { width: 100%; max-width: 1180px; margin: 0 auto; }
+  .wrap-wide { width: 100%; max-width: 1300px; margin: 0 auto; }
+
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: clamp(20px, 3vh, 32px);
+  }
+  .eyebrow::before {
+    content: "";
+    width: 36px;
+    height: 1px;
+    background: var(--ink);
+    flex: none;
+  }
+
+  h2 {
+    font-size: clamp(27px, 3.2vw, 42px);
+    font-weight: 700;
+    line-height: 1.24;
+    letter-spacing: 0.01em;
+    color: var(--ink);
+  }
+  .lead {
+    margin-top: 22px;
+    font-size: clamp(14px, 1.12vw, 16.5px);
+    line-height: 1.85;
+    color: var(--ink-soft);
+    max-width: 54em;
+  }
+
+  .slide-foot {
+    position: absolute;
+    left: clamp(24px, 6vw, 88px);
+    right: clamp(24px, 6vw, 88px);
+    bottom: clamp(18px, 3vh, 32px);
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gray-light);
+  }
+
+  /* ================= 02 轴线思维导图 ================= */
+  .mind {
+    display: grid;
+    grid-template-columns: minmax(148px, 180px) minmax(0, 1fr) minmax(96px, 130px);
+    gap: clamp(20px, 3.4vw, 56px);
+    align-items: stretch;
+  }
+
+  .mind-notes {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: right;
+    font-size: 15px;
+    line-height: 1.55;
+    color: #777777;
+  }
+  .mind-notes p { color: #777777; }
+  .mind-notes .note-strong {
+    font-size: 15px;
+    letter-spacing: 0.2em;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .mind-notes .note-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--gray-light);
+    margin-bottom: 4px;
+  }
+
+  .mind-main { position: relative; }
+  .mnode { position: relative; padding-left: 56px; height: 168px; }
+  .mnode:last-child { height: auto; padding-bottom: 0; }
+  .mnode .dot {
+    position: absolute;
+    left: 0; top: 8px;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--ink);
+  }
+  .mnode .arc {
+    position: absolute;
+    left: -11.5px; top: 11.5px;
+    width: 30px; height: 168px;
+    border-right: 1px solid var(--ink);
+    border-radius: 50%;
+  }
+  .mnode:last-child .arc { display: none; }
+  .mnode h3 {
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    padding-top: 2px;
+    margin-bottom: 8px;
+  }
+  .mnode ul { list-style: none; max-width: 640px; }
+  .mnode li {
+    position: relative;
+    padding-left: 24px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+  .mnode li .i {
+    position: absolute;
+    left: 0; top: 0;
+    font-family: var(--mono);
+    font-size: 10px;
+    line-height: 2.2;
+    letter-spacing: 0.06em;
+    color: var(--gray-light);
+  }
+
+  .mind-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .mind-title span {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    color: var(--ink);
+    line-height: 1;
+    font-weight: 400;
+  }
+  .mind-title .t-main { font-size: 46px; letter-spacing: 0.22em; }
+  .mind-title .t-core { font-size: 62px; font-weight: 700; letter-spacing: 0.18em; }
+  .mind-title .t-sep::before {
+    content: "·";
+    font-size: 34px;
+    color: #666666;
+    line-height: 1;
+  }
+
+  /* ================= 03 简介 / 优势 ================= */
+  .adv {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 clamp(28px, 4.4vw, 72px);
+    margin-top: clamp(26px, 4vh, 44px);
+  }
+  .adv-item {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 14px;
+    padding: clamp(16px, 2.2vh, 24px) 0;
+    border-top: 1px solid var(--line);
+  }
+  .adv-no {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--gray-light);
+    padding-top: 4px;
+  }
+  .adv-item h3 {
+    font-size: clamp(15px, 1.2vw, 17px);
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    margin-bottom: 7px;
+  }
+  .adv-item p {
+    font-size: clamp(13.5px, 1.02vw, 15px);
+    line-height: 1.75;
+    color: var(--ink-soft);
+  }
+
+  /* ================= 经历页 ================= */
+  .job-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 26px;
+    padding-bottom: clamp(16px, 2.4vh, 24px);
+    border-bottom: 1px solid var(--ink);
+  }
+  .job-role {
+    font-size: clamp(23px, 2.5vw, 32px);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .job-org {
+    font-size: clamp(13.5px, 1.05vw, 15px);
+    color: var(--gray);
+    letter-spacing: 0.02em;
+  }
+  .job-time {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    color: var(--ink);
+    margin-left: auto;
+  }
+
+  .points { list-style: none; }
+  .points li {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: clamp(12px, 2vw, 26px);
+    padding: clamp(14px, 2vh, 22px) 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .points li:last-child { border-bottom: none; }
+  .points .no {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--gray-light);
+    padding-top: 5px;
+  }
+  .points h3 {
+    font-size: clamp(15px, 1.18vw, 17px);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    margin-bottom: 6px;
+  }
+  .points p {
+    font-size: clamp(13.5px, 1.02vw, 15px);
+    line-height: 1.8;
+    color: var(--ink-soft);
+    max-width: 62em;
+  }
+  .job-intro {
+    margin-top: clamp(14px, 2vh, 20px);
+    font-size: clamp(13.5px, 1.02vw, 15px);
+    line-height: 1.8;
+    color: var(--gray);
+  }
+
+  /* ================= 数据条 ================= */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    margin-top: clamp(18px, 2.6vh, 28px);
+  }
+  .stats div {
+    padding: clamp(16px, 2.4vh, 26px) clamp(12px, 1.6vw, 22px);
+    border-right: 1px solid var(--line);
+  }
+  .stats div:last-child { border-right: none; }
+  .stats b {
+    display: block;
+    font-size: clamp(24px, 2.7vw, 36px);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+  }
+  .stats span {
+    display: block;
+    margin-top: 9px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gray);
+  }
+  .stat-note {
+    margin-top: 14px;
+    font-size: clamp(12.5px, 0.96vw, 14px);
+    color: var(--gray);
+    letter-spacing: 0.02em;
+  }
+
+  /* ================= 教育 / 技能 ================= */
+  .duo {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(28px, 5vw, 84px);
+    margin-top: clamp(8px, 1.4vh, 16px);
+  }
+  .duo-title {
+    font-size: clamp(20px, 2vw, 26px);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .duo-meta {
+    margin-top: 10px;
+    font-size: clamp(13.5px, 1.02vw, 15px);
+    color: var(--gray);
+    letter-spacing: 0.03em;
+  }
+  .tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  .tag {
+    display: inline-block;
+    border: 1px solid var(--line-2);
+    padding: 9px 16px;
+    font-size: clamp(12.5px, 0.96vw, 14px);
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+  }
+
+  /* ================= 结尾 ================= */
+  .closing-title {
+    font-size: clamp(34px, 5vw, 66px);
+    font-weight: 700;
+    line-height: 1.16;
+    letter-spacing: 0.02em;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 12px; margin-top: clamp(28px, 4vh, 44px); }
+  .chip {
+    border: 1px solid var(--line-2);
+    padding: 12px 22px;
+    font-size: clamp(12.5px, 0.98vw, 14px);
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+  }
+  .chip.hot {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #ffffff;
+  }
+
+  /* ================= 平板 ================= */
+  @media (max-width: 1023px) {
+    .mind { grid-template-columns: minmax(130px, 160px) minmax(0, 1fr) 84px; }
+    .mnode { height: auto; padding-left: 40px; padding-bottom: 34px; }
+    .mnode .arc { display: none; }
+    .mnode::after {
+      content: "";
+      position: absolute;
+      left: 3px; top: 14px; bottom: 0;
+      width: 1px;
+      background: var(--line-2);
+    }
+    .mnode:last-child::after { display: none; }
+    .mind-title .t-main { font-size: 38px; }
+    .mind-title .t-core { font-size: 52px; }
+    .mind-title .t-sep::before { font-size: 28px; }
+  }
+
+  /* ================= 移动端 ================= */
+  @media (max-width: 768px) {
+    .slide {
+      min-height: auto;
+      justify-content: flex-start;
+      padding: 56px 20px 76px;
+    }
+    .slide-foot { left: 20px; right: 20px; bottom: 22px; }
+
+    .eyebrow { font-size: 10px; letter-spacing: 0.24em; gap: 12px; }
+    .eyebrow::before { width: 24px; }
+
+    .mind {
+      display: flex;
+      flex-direction: column;
+      gap: 26px;
+    }
+    .mind-title {
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 0;
+      order: -1;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+      width: 100%;
+    }
+    .mind-title span { writing-mode: horizontal-tb; }
+    .mind-title .t-main { font-size: 26px; letter-spacing: 0.12em; }
+    .mind-title .t-core { font-size: 32px; letter-spacing: 0.1em; }
+    .mind-title .t-sep::before {
+      content: "｜";
+      font-size: 22px;
+      color: #c4c1bb;
+      margin: 0 8px;
+    }
+    .mind-notes {
+      text-align: left;
+      font-size: 15px;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--line);
+    }
+    .mind-notes .note-strong { font-size: 16px; }
+    .mind-notes .note-label { font-size: 10px; }
+
+    .mnode { padding-left: 26px; padding-bottom: 30px; }
+    .mnode h3 { font-size: 19px; letter-spacing: 0.12em; }
+    .mnode ul { max-width: none; }
+    .mnode li { font-size: 16px; line-height: 1.65; padding-left: 26px; }
+    .mnode li .i { font-size: 11px; }
+
+    .adv { grid-template-columns: minmax(0, 1fr); }
+    .adv-item { padding: 18px 0; }
+    .adv-item h3 { font-size: 16px; }
+    .adv-item p { font-size: 15px; line-height: 1.7; }
+
+    .job-head { gap: 6px 14px; }
+    .job-role { font-size: 24px; }
+    .job-time { margin-left: 0; width: 100%; }
+    .job-org { font-size: 14px; }
+    .points li { grid-template-columns: 26px minmax(0, 1fr); gap: 10px; padding: 16px 0; }
+    .points h3 { font-size: 16px; }
+    .points p { font-size: 15px; line-height: 1.7; }
+
+    .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .stats div { border-bottom: 1px solid var(--line); }
+    .stats div:nth-child(2n) { border-right: none; }
+    .stats b { font-size: 26px; }
+    .stat-note { font-size: 13px; line-height: 1.6; }
+
+    .duo { grid-template-columns: minmax(0, 1fr); gap: 34px; }
+    .duo-title { font-size: 22px; }
+    .chip { padding: 11px 18px; font-size: 13px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style></head><body><section class="cover" data-ink-id="ink-01a17c9b-d1dc-735e-9825-8065821c283d">
+ <div class="cover-name" data-ink-id="ink-01a17c9b-d1dc-7ba6-a345-f5ca46e5f5b2">ALIN</div>
+ <div class="cover-sub" data-ink-id="ink-01a17c9b-d1dc-7df4-9e74-3d357704d7d8">Resume · Portfolio</div>
+ <div class="cover-note" data-ink-id="ink-01a17c9b-d1dc-744f-9547-2475d43bc49f">更新中......</div>
+</section>
+<section class="slide" data-ink-id="ink-01a17c9b-d1dc-78a9-8049-d0cf3c94d153">
+ <div class="wrap wrap-wide" data-ink-id="ink-01a17c9b-d1dc-7afa-9807-512bc402e76f">
+  <div class="eyebrow" data-ink-id="ink-01a17c9b-d1dc-785d-9c05-c0adfd895150">Profile Map · 个人简历</div>
+  <div class="mind" data-ink-id="ink-01a17c9b-d1dc-703b-9429-d3cc36f9a041">
+   <aside class="mind-notes" data-ink-id="ink-01a17c9b-d1dc-7abf-ac30-fb86afd6f6d0">
+    <div class="note" data-ink-id="ink-01a17c9b-d1dc-7887-baac-274e48bec514">
+     <p class="note-strong" data-ink-id="ink-01a17c9b-d1dc-729b-8850-ae2511ad2e9a">ALIN</p>
+     <p data-ink-id="ink-01a17c9b-d1dc-768e-8dec-8920dc5543ad">女 ｜ 34 岁</p>
+    </div>
+    <div class="note" data-ink-id="ink-01a17c9b-d1dc-71b6-974c-53d5427ed65e">
+     <p class="note-label" data-ink-id="ink-01a17c9b-d1dc-7283-a5d7-1906e5be28c5">联系方式</p>
+     <p data-ink-id="ink-01a17c9b-d1dc-7041-b28f-4f1f6fe95c8b">电话 137XXXXXXX1</p>
+     <p data-ink-id="ink-01a17c9b-d1dc-76ea-9ab2-a4899a4e26ff">微信 x0</p>
+     <p data-ink-id="ink-01a17c9b-d1dc-7c66-8e83-51856f6467df">邮箱 2@qq.com</p>
+    </div>
+    <div class="note" data-ink-id="ink-01a17c9b-d1dc-7edb-87f7-d63cd68a2d5b">
+     <p class="note-label" data-ink-id="ink-01a17c9b-d1dc-71c8-b226-b7b77c9fe488">求职信息</p>
+     <p data-ink-id="ink-01a17c9b-d1dc-7547-b86b-a05f24ffc702">求职意向：新媒体运营</p>
+     <p data-ink-id="ink-01a17c9b-d1dc-73dc-8e23-4a1aaa8b62b1">期望城市：上海</p>
+    </div>
+   </aside>
+   <div class="mind-main" data-ink-id="ink-01a17c9b-d1dc-7e15-a578-7dadce6c3a48">
+    <div class="mnode" data-ink-id="ink-01a17c9b-d1dc-7433-a96f-a13eacf548a1">
+     <span class="dot" data-ink-id="ink-01a17c9b-d1dc-77c3-9e6d-6c98ba41e5fe"></span><span class="arc" data-ink-id="ink-01a17c9b-d1dc-79fd-8e8a-183908015ddb"></span>
+     <h3 data-ink-id="ink-01a17c9b-d1dc-7b0f-b0f3-d71f2385de54">奖项</h3>
+     <ul data-ink-id="ink-01a17c9b-d1dc-7e8a-9f5a-8a64a48050a9">
+      <li data-ink-id="ink-01a17c9b-d1dc-7c7c-b5bf-3ab54c6a45f2"><span class="i" data-ink-id="ink-01a17c9b-d1dc-78ac-a345-5e52ee48a9c6">1</span>地建师投报 6 个项目，延伸活动：女建筑师、专题月等</li>
+      <li data-ink-id="ink-01a17c9b-d1dc-79ed-9723-06c22bd3f940"><span class="i" data-ink-id="ink-01a17c9b-d1dc-7786-b6a3-bc66f5c126c0">2</span>上勘协投报 3 个项目，延伸活动：豪宅、商业、工业考察</li>
+      <li data-ink-id="ink-01a17c9b-d1dc-7fe0-8ba6-7f3ed7efe161"><span class="i" data-ink-id="ink-01a17c9b-d1dc-779f-831b-e01569a47115">3</span>优青工程师等大陆奖项</li>
+     </ul>
+    </div>
+    <div class="mnode" data-ink-id="ink-01a17c9b-d1dc-721b-8838-b5520ca860f0">
+     <span class="dot" data-ink-id="ink-01a17c9b-d1dc-7458-b906-6973bc8a12b8"></span><span class="arc" data-ink-id="ink-01a17c9b-d1dc-7507-aba6-9ee643434b74"></span>
+     <h3 data-ink-id="ink-01a17c9b-d1dc-7d87-a9c5-230135bae469">视觉</h3>
+     <ul data-ink-id="ink-01a17c9b-d1dc-70b8-8e22-435ce556e3d3">
+      <li data-ink-id="ink-01a17c9b-d1dc-7332-b78d-ce97cbbca8d4"><span class="i" data-ink-id="ink-01a17c9b-d1dc-7a8e-a51a-667b054ff4f8">1</span>24 年度尾牙影片制作</li>
+      <li data-ink-id="ink-01a17c9b-d1dc-7b66-800d-696bb7dee8e7"><span class="i" data-ink-id="ink-01a17c9b-d1dc-7120-9190-a01c50f3efd1">2</span>摄影资源库搭建</li>
+      <li data-ink-id="ink-01a17c9b-d1dc-7035-be39-22f6ded58aed"><span class="i" data-ink-id="ink-01a17c9b-d1dc-73de-aa21-c61657ca2d7b">3</span>已完成：深圳汇顶、晶合补拍、泰国致伸</li>
+      <li data-ink-id="ink-01a17c9b-d1dc-755f-90c4-da24cac92f0a"><span class="i" data-ink-id="ink-01a17c9b-d1dc-7b9f-be89-4adc7fa1de5e">4</span>进行中：乳山二期、肇庆希音</li>
+     </ul>
+    </div>
+    <div class="mnode" data-ink-id="ink-01a17c9b-d1dc-7da5-8aa4-10022a917cd6">
+     <span class="dot" data-ink-id="ink-01a17c9b-d1dc-79a5-87dc-c6e598514181"></span><span class="arc" data-ink-id="ink-01a17c9b-d1dc-7018-86dc-3a4bc8cdd991"></span>
+     <h3 data-ink-id="ink-01a17c9b-d1dc-763f-84a1-76480d906236">传播</h3>
+     <ul data-ink-id="ink-01a17c9b-d1dc-7643-a227-5b36b04c868f">
+      <li data-ink-id="ink-01a17c9b-d1dc-7eea-8bc0-2c02a53561ba"><span class="i" data-ink-id="ink-01a17c9b-d1dc-778c-a71e-9ee2c88e0d41">1</span>百度词条、百度营销账号</li>
+      <li data-ink-id="ink-01a17c9b-d1dc-78ff-9b66-35d99cc5e4b6"><span class="i" data-ink-id="ink-01a17c9b-d1dc-7af8-a6f2-2d0d59ad8bae">2</span>协同奖项活动的微信文章</li>
+      <li data-ink-id="ink-01a17c9b-d1dc-76f4-917e-9f4ed7a1634d"><span class="i" data-ink-id="ink-01a17c9b-d1dc-7094-a445-f9bf155a013e">3</span>行业交流：CHCC、1m 建筑直播访谈等</li>
+     </ul>
+    </div>
+    <div class="mnode" data-ink-id="ink-01a17c9b-d1dc-7a7b-966b-b79bfeee6b5d">
+     <span class="dot" data-ink-id="ink-01a17c9b-d1dc-778a-83c2-0227203d8eee"></span>
+     <h3 data-ink-id="ink-01a17c9b-d1dc-7fe4-a127-36e9b501e2f5">日常</h3>
+     <ul data-ink-id="ink-01a17c9b-d1dc-7635-805e-8465126688a8">
+      <li data-ink-id="ink-01a17c9b-d1dc-7f9d-8e0f-a2a7a054f1b0"><span class="i" data-ink-id="ink-01a17c9b-d1dc-7e4e-a702-70236e04e0e8">1</span>建立大陆官网内容发布流程 SOP</li>
+      <li data-ink-id="ink-01a17c9b-d1dc-7018-86f1-20a9ba4d5258"><span class="i" data-ink-id="ink-01a17c9b-d1dc-7983-b5da-fb3078c854ad">2</span>简体官网的运维</li>
+      <li data-ink-id="ink-01a17c9b-d1dc-7108-8448-2ae1124076e6"><span class="i" data-ink-id="ink-01a17c9b-d1dc-7bce-b9f0-7508c03d3c91">3</span>业绩整理：三联活动、半导体、住宅等</li>
+      <li data-ink-id="ink-01a17c9b-d1dc-7038-80c1-a047b58b183d"><span class="i" data-ink-id="ink-01a17c9b-d1dc-763f-9695-f52100ad5a9f">4</span>业务支持：不定期招投标、竞赛讯息收集</li>
+      <li data-ink-id="ink-01a17c9b-d1dc-71fe-b208-5b5626beaa15"><span class="i" data-ink-id="ink-01a17c9b-d1dc-716e-8a4f-db3c6e8abc75">5</span>档案管理</li>
+     </ul>
+    </div>
+   </div>
+   <div class="mind-title" data-ink-id="ink-01a17c9b-d1dc-76d2-8969-2c7a158e83f4">
+    <span class="t-main" data-ink-id="ink-01a17c9b-d1dc-7b82-bf71-c3c1e71ac837">品牌</span> <span class="t-sep" data-ink-id="ink-01a17c9b-d1dc-7758-8f3a-1ee8575034a6"></span> <span class="t-core" data-ink-id="ink-01a17c9b-d1dc-7e0e-a48a-82c8723c1892">企划</span> <span class="t-sep" data-ink-id="ink-01a17c9b-d1dc-741a-8610-edf757a7697f"></span> <span class="t-main" data-ink-id="ink-01a17c9b-d1dc-7adf-90d9-da81093a9c35">建筑</span>
+   </div>
+  </div>
+ </div>
+ <div class="slide-foot" data-ink-id="ink-01a17c9b-d1dc-7d98-93f1-09b8936377b0">
+  <span data-ink-id="ink-01a17c9b-d1dc-7f51-b8ff-c5b401656312">ALIN · 简历与作品集</span><span data-ink-id="ink-01a17c9b-d1dc-7df2-853f-2dd589c26465">02 / 09</span>
+ </div>
+</section>
+<section class="slide" data-ink-id="ink-01a17c9b-d1dc-7a7a-91d4-c7ec3ab26e9d">
+ <div class="wrap" data-ink-id="ink-01a17c9b-d1dc-7028-8a29-e0bc9449983a">
+  <div class="eyebrow" data-ink-id="ink-01a17c9b-d1dc-7eea-a9e7-3c1d8da49e3c">About · 个人简介</div>
+  <h2 data-ink-id="ink-01a17c9b-d1dc-7e40-84ca-2ba72bee0228">以设计为底，
+   <br>
+   做品牌内容的转译者。</h2>
+  <p class="lead" data-ink-id="ink-01a17c9b-d1dc-7118-80ce-2c54b84caa50">具备建筑景观设计与品牌内容策划双重背景，拥有设计行业品牌传播与新媒体内容创作经验。熟悉微信公众号、官网、小红书等平台运营，擅长选题策划、品牌文案、图文排版，以及建筑奖项申报材料的整理与编制；具备平台内容体系搭建、行业资源对接与跨部门协作能力，能够独立推进内容策划、制作、发布及品牌传播项目的完整落地。</p>
+  <div class="adv" data-ink-id="ink-01a17c9b-d1dc-729d-af63-ec75fdf1cf56">
+   <div class="adv-item" data-ink-id="ink-01a17c9b-d1dc-718b-9248-840148fc0234">
+    <div class="adv-no" data-ink-id="ink-01a17c9b-d1dc-797e-af8d-ff151ce31a8a">01</div>
+    <div data-ink-id="ink-01a17c9b-d1dc-7782-99df-33d938521c70">
+     <h3 data-ink-id="ink-01a17c9b-d1dc-7353-8903-037ba2065c62">双重专业背景</h3>
+     <p data-ink-id="ink-01a17c9b-d1dc-79fc-9f73-02aa391879da">建筑景观设计与品牌内容策划并行，既读得懂图纸，也写得出面向大众的品牌表达。</p>
+    </div>
+   </div>
+   <div class="adv-item" data-ink-id="ink-01a17c9b-d1dc-7a49-b96f-8af5a4a7899f">
+    <div class="adv-no" data-ink-id="ink-01a17c9b-d1dc-73b1-bebf-79dfd56fd1c1">02</div>
+    <div data-ink-id="ink-01a17c9b-d1dc-7197-9584-06c9c1ec1c2a">
+     <h3 data-ink-id="ink-01a17c9b-d1dc-7dda-8acc-72dc872a9067">内容全流程能力</h3>
+     <p data-ink-id="ink-01a17c9b-d1dc-758e-b0a9-c5f185ab883e">从选题策划、文案撰写、图文排版到发布与复盘，可独立推进内容项目平稳落地。</p>
+    </div>
+   </div>
+   <div class="adv-item" data-ink-id="ink-01a17c9b-d1dc-76fb-84a3-4b3488048167">
+    <div class="adv-no" data-ink-id="ink-01a17c9b-d1dc-76c9-bcc6-64205c7653be">03</div>
+    <div data-ink-id="ink-01a17c9b-d1dc-71da-a087-7b54adcd2628">
+     <h3 data-ink-id="ink-01a17c9b-d1dc-709f-9490-382a73f5a67d">平台从 0 到 1</h3>
+     <p data-ink-id="ink-01a17c9b-d1dc-75ef-9847-cf73bad253e5">搭建简中官网内容发布 SOP，建立百度词条与营销账号，让内容运营具备可持续机制。</p>
+    </div>
+   </div>
+   <div class="adv-item" data-ink-id="ink-01a17c9b-d1dc-7f66-a348-3a6dafed1244">
+    <div class="adv-no" data-ink-id="ink-01a17c9b-d1dc-7b3f-a529-b3490cf8a75c">04</div>
+    <div data-ink-id="ink-01a17c9b-d1dc-72b4-8cb0-fc47eb59ac93">
+     <h3 data-ink-id="ink-01a17c9b-d1dc-7c06-b23c-ab0bea7f7c3b">行业资源对接</h3>
+     <p data-ink-id="ink-01a17c9b-d1dc-789c-930e-dcb0f5e73d14">与协会、奖项、行业媒体及直播平台保持长期协作，跨部门推动品牌活动落地。</p>
+    </div>
+   </div>
+  </div>
+ </div>
+ <div class="slide-foot" data-ink-id="ink-01a17c9b-d1dc-74e2-ad46-7dd7ac5e8c19">
+  <span data-ink-id="ink-01a17c9b-d1dc-7e32-8385-1a1a014c2576">ALIN · 简历与作品集</span><span data-ink-id="ink-01a17c9b-d1dc-70c9-9cc5-8e7beae6a295">03 / 09</span>
+ </div>
+</section>
+<section class="slide" data-ink-id="ink-01a17c9b-d1dc-7c72-8f8c-cc83a749d8a7">
+ <div class="wrap" data-ink-id="ink-01a17c9b-d1dc-7198-baea-93fe074411d1">
+  <div class="eyebrow" data-ink-id="ink-01a17c9b-d1dc-73c4-b13b-da058c63d3e1">Experience 01 · 工作经历</div>
+  <div class="job-head" data-ink-id="ink-01a17c9b-d1dc-78f3-9918-0069f1c6b488">
+   <div class="job-role" data-ink-id="ink-01a17c9b-d1dc-71ef-af11-1fef20f70e55">企划专员</div>
+   <div class="job-org" data-ink-id="ink-01a17c9b-d1dc-79f0-aace-d61f056ecc0c">上海 ZJ 建筑设计院有限公司 三院</div>
+   <div class="job-time" data-ink-id="ink-01a17c9b-d1dc-7205-a9aa-9942a77c1a83">2024.11 — 至今</div>
+  </div>
+  <ul class="points" data-ink-id="ink-01a17c9b-d1dc-7847-ae9c-3f1fcd6f95c2">
+   <li data-ink-id="ink-01a17c9b-d1dc-76ff-97cd-e6f63ec33506">
+    <div class="no" data-ink-id="ink-01a17c9b-d1dc-7f11-8e1e-ab5b6c9f3429">01</div>
+    <div data-ink-id="ink-01a17c9b-d1dc-79e0-9aba-7376c2b76a35">
+     <h3 data-ink-id="ink-01a17c9b-d1dc-7edd-a08a-6968a35f5ba5">项目案例与文案策划</h3>
+     <p data-ink-id="ink-01a17c9b-d1dc-7650-90b7-daf2e4beb52f">负责官网、微信公众号等平台的内容策划与更新，撰写项目宣传稿、专题稿及品牌活动文案；针对不同平台与受众，把专业设计内容转化为利于品牌传播的表达。</p>
+    </div>
+   </li>
+   <li data-ink-id="ink-01a17c9b-d1dc-7db6-a006-ff88e9116796">
+    <div class="no" data-ink-id="ink-01a17c9b-d1dc-71f5-a8eb-8fab979ae175">02</div>
+    <div data-ink-id="ink-01a17c9b-d1dc-7cbe-8382-98ea7df8ec1f">
+     <h3 data-ink-id="ink-01a17c9b-d1dc-7940-b545-52ff2d81f5ce">品牌平台建设</h3>
+     <p data-ink-id="ink-01a17c9b-d1dc-7aa4-953c-009c6a996094">搭建简中官网内容发布 SOP 并负责日常维护，完成百度词条与百度营销账号从 0 到 1 的搭建。</p>
+    </div>
+   </li>
+   <li data-ink-id="ink-01a17c9b-d1dc-75d9-b8f5-a27d336e83d1">
+    <div class="no" data-ink-id="ink-01a17c9b-d1dc-7080-94eb-3fdd6c5a2fd9">03</div>
+    <div data-ink-id="ink-01a17c9b-d1dc-7b30-b1b2-5818772f45c5">
+     <h3 data-ink-id="ink-01a17c9b-d1dc-7c2b-8c91-f3275d92def0">新媒体与品牌活动</h3>
+     <p data-ink-id="ink-01a17c9b-d1dc-7571-82d8-ab0bddde1bd9">策划并推进「女建筑师」「专题月」「年度影片」等品牌内容项目，参与图文制作与后续宣传事宜，串联内容、视觉与活动节奏。</p>
+    </div>
+   </li>
+   <li data-ink-id="ink-01a17c9b-d1dc-75c7-afdf-1b51d90026ee">
+    <div class="no" data-ink-id="ink-01a17c9b-d1dc-766d-b4d6-504f53f23325">04</div>
+    <div data-ink-id="ink-01a17c9b-d1dc-7202-8c56-153a5ce81d36">
+     <h3 data-ink-id="ink-01a17c9b-d1dc-7dd1-810f-78e0304f139b">行业资源拓展</h3>
+     <p data-ink-id="ink-01a17c9b-d1dc-7973-bcca-9cde6a900be0">对接上海勘协、建筑学会、Dezeen、地建师、CHCC、1m 建筑等行业机构与媒体平台，参与建筑奖项申报、直播访谈及专题合作，协同跨部门团队推进品牌活动落地。</p>
+    </div>
+   </li>
+  </ul>
+ </div>
+ <div class="slide-foot" data-ink-id="ink-01a17c9b-d1dc-7c98-a349-ca575b1ec331">
+  <span data-ink-id="ink-01a17c9b-d1dc-767b-b918-916687921e66">ALIN · 简历与作品集</span><span data-ink-id="ink-01a17c9b-d1dc-744a-b327-6ed81b6f44be">04 / 09</span>
+ </div>
+</section>
+<section class="slide" data-ink-id="ink-01a17c9b-d1dc-7276-a610-7bd1561aad85">
+ <div class="wrap" data-ink-id="ink-01a17c9b-d1dc-704a-a332-41072b09a6bb">
+  <div class="eyebrow" data-ink-id="ink-01a17c9b-d1dc-70f0-ae82-1a861571eb27">Experience 02 · 新媒体运营</div>
+  <div class="job-head" data-ink-id="ink-01a17c9b-d1dc-7b29-92aa-99f218d3926d">
+   <div class="job-role" data-ink-id="ink-01a17c9b-d1dc-7b99-a43a-f6cb18c50ca3">小红书账号运营</div>
+   <div class="job-org" data-ink-id="ink-01a17c9b-d1dc-7be3-a12f-26e9b6a26407">上海 PP 建筑设计事务所有限公司</div>
+   <div class="job-time" data-ink-id="ink-01a17c9b-d1dc-74ed-b99a-195240211795">2024.03 — 2024.10</div>
+  </div>
+  <ul class="points" data-ink-id="ink-01a17c9b-d1dc-7118-8155-2493c41a7dc8">
+   <li data-ink-id="ink-01a17c9b-d1dc-74b8-a712-e07c5de7461a">
+    <div class="no" data-ink-id="ink-01a17c9b-d1dc-713d-9876-89ddc7c923c8">01</div>
+    <div data-ink-id="ink-01a17c9b-d1dc-7801-a0d9-05fab0430a6c">
+     <h3 data-ink-id="ink-01a17c9b-d1dc-73c0-97d3-13ae70a5b3fa">账号定位</h3>
+     <p data-ink-id="ink-01a17c9b-d1dc-7fd4-aef2-463d1284dc55">熟悉平台规则与内容分发逻辑，结合品牌调性确定账号定位与内容主线。</p>
+    </div>
+   </li>
+   <li data-ink-id="ink-01a17c9b-d1dc-7a3f-bcae-9fa4b07fdaf9">
+    <div class="no" data-ink-id="ink-01a17c9b-d1dc-7c4b-91f7-e19d165c605c">02</div>
+    <div data-ink-id="ink-01a17c9b-d1dc-7a20-b4e3-58cd63ec63fc">
+     <h3 data-ink-id="ink-01a17c9b-d1dc-76e8-9382-8be5015d2807">竞品对标</h3>
+     <p data-ink-id="ink-01a17c9b-d1dc-75ee-a0c3-6d16ed3318f7">选取 10 个以上同领域对标账号做深度分析，梳理内容方向、更新节奏与视觉风格差异。</p>
+    </div>
+   </li>
+   <li data-ink-id="ink-01a17c9b-d1dc-7c16-8ec2-ca3712393ce7">
+    <div class="no" data-ink-id="ink-01a17c9b-d1dc-7ff3-8ada-c1e6c1d82b5b">03</div>
+    <div data-ink-id="ink-01a17c9b-d1dc-7c10-8dbc-29bb5573573f">
+     <h3 data-ink-id="ink-01a17c9b-d1dc-798a-924d-f113e309b279">爆文拆解</h3>
+     <p data-ink-id="ink-01a17c9b-d1dc-7701-92ec-ba18a1094e81">对对标账号的爆款图文与视频做整体拆解，涵盖选题、封面、内容结构、关键词等，总结可借鉴与可创新的部分。</p>
+    </div>
+   </li>
+   <li data-ink-id="ink-01a17c9b-d1dc-740d-92a2-5088fbd14aa6">
+    <div class="no" data-ink-id="ink-01a17c9b-d1dc-73e2-a587-c28e966879d5">04</div>
+    <div data-ink-id="ink-01a17c9b-d1dc-7cfb-bacd-de07605ad051">
+     <h3 data-ink-id="ink-01a17c9b-d1dc-7a46-bf5b-b06208a54aa7">运营成果</h3>
+     <p data-ink-id="ink-01a17c9b-d1dc-7127-9dd8-1a5905729037">账号 1 输出笔记 100 篇以上，小红书涨粉 1 万以上并持续稳定增长；账号 2 输出笔记 70 篇以上，其中约四分之一浏览量过万。</p>
+    </div>
+   </li>
+  </ul>
+  <div class="stats" data-ink-id="ink-01a17c9b-d1dc-7c6e-a645-1511f97b4c9e">
+   <div data-ink-id="ink-01a17c9b-d1dc-7b58-8c37-424758e6bb82">
+    <b data-ink-id="ink-01a17c9b-d1dc-7239-a510-6ca00b88c563">100+</b><span data-ink-id="ink-01a17c9b-d1dc-75ba-921c-7b118986201a">账号 1 笔记篇数</span>
+   </div>
+   <div data-ink-id="ink-01a17c9b-d1dc-7573-a593-cd945f512095">
+    <b data-ink-id="ink-01a17c9b-d1dc-78ba-9ba8-2c7418e199b4">1w+</b><span data-ink-id="ink-01a17c9b-d1dc-7f23-9aaf-67164a641ef8">粉丝增长</span>
+   </div>
+   <div data-ink-id="ink-01a17c9b-d1dc-7314-8eed-287a54690b50">
+    <b data-ink-id="ink-01a17c9b-d1dc-71e7-b17a-ab2604fe88f2">26w+</b><span data-ink-id="ink-01a17c9b-d1dc-78e3-9f4a-bcc087013edc">单篇最高浏览</span>
+   </div>
+   <div data-ink-id="ink-01a17c9b-d1dc-77de-8c40-0ee68deffd7b">
+    <b data-ink-id="ink-01a17c9b-d1dc-7659-8555-e402cde44fe7">7.6w</b><span data-ink-id="ink-01a17c9b-d1dc-7fb9-9330-d6b99f3d367c">赞藏总量</span>
+   </div>
+  </div>
+  <p class="stat-note" data-ink-id="ink-01a17c9b-d1dc-7731-849c-61646b88b027">数据统计周期：2024.03 — 2024.10，两个账号并行运营。</p>
+ </div>
+ <div class="slide-foot" data-ink-id="ink-01a17c9b-d1dc-79c2-a9d2-571573d5602a">
+  <span data-ink-id="ink-01a17c9b-d1dc-73bb-b126-ed0c9811cf0e">ALIN · 简历与作品集</span><span data-ink-id="ink-01a17c9b-d1dc-7a89-814c-f84f79dd10c2">05 / 09</span>
+ </div>
+</section>
+<section class="slide" data-ink-id="ink-01a17c9b-d1dc-762d-a69c-a6045a132315">
+ <div class="wrap" data-ink-id="ink-01a17c9b-d1dc-7ab1-88e2-4512d539c346">
+  <div class="eyebrow" data-ink-id="ink-01a17c9b-d1dc-79f3-97f8-02aec2b23090">Experience 03 · 设计经历</div>
+  <div class="job-head" data-ink-id="ink-01a17c9b-d1dc-78d4-b6d1-199e66d5feee">
+   <div class="job-role" data-ink-id="ink-01a17c9b-d1dc-7002-a898-38b0babd336b">建筑景观设计师</div>
+   <div class="job-org" data-ink-id="ink-01a17c9b-d1dc-7d38-9cc0-a7f3e2833ce4">上海 ZJ 建筑设计院有限公司 三院</div>
+   <div class="job-time" data-ink-id="ink-01a17c9b-d1dc-7a2b-848d-a085d0f76f4f">2019.07 — 2023.12</div>
+  </div>
+  <p class="job-intro" data-ink-id="ink-01a17c9b-d1dc-7e79-a8ca-bc58ca494141">作为主创设计师，带队完成建筑规划与景观设计等相关工作。</p>
+  <ul class="points" data-ink-id="ink-01a17c9b-d1dc-7759-83c5-3902af20d52f">
+   <li data-ink-id="ink-01a17c9b-d1dc-765a-8f3c-441826b4993e">
+    <div class="no" data-ink-id="ink-01a17c9b-d1dc-701c-a8a9-924ae589553d">01</div>
+    <div data-ink-id="ink-01a17c9b-d1dc-7b1a-904f-5131efcf0f69">
+     <h3 data-ink-id="ink-01a17c9b-d1dc-72a7-843c-26d7f56d7127">市场与竞品研究</h3>
+     <p data-ink-id="ink-01a17c9b-d1dc-7e6d-bb10-9fce85b0cc14">研究市场、分析竞品，发现问题、提炼亮点，为甲方提供切实可行的方案。</p>
+    </div>
+   </li>
+   <li data-ink-id="ink-01a17c9b-d1dc-7184-8f88-69ff1482a013">
+    <div class="no" data-ink-id="ink-01a17c9b-d1dc-72af-b501-44d680c0ffda">02</div>
+    <div data-ink-id="ink-01a17c9b-d1dc-72e8-9277-e024de5911e0">
+     <h3 data-ink-id="ink-01a17c9b-d1dc-7409-91d5-0729af546245">理念与文案</h3>
+     <p data-ink-id="ink-01a17c9b-d1dc-7d8c-b66e-acff671bedeb">钻研前沿的设计理念，完成方案的创意理念、设计概念与文案编写。</p>
+    </div>
+   </li>
+   <li data-ink-id="ink-01a17c9b-d1dc-7034-8d13-ef97c4ae608c">
+    <div class="no" data-ink-id="ink-01a17c9b-d1dc-7d1d-930c-502d1be8a48c">03</div>
+    <div data-ink-id="ink-01a17c9b-d1dc-7376-99d2-8c912f5771bd">
+     <h3 data-ink-id="ink-01a17c9b-d1dc-72c8-84c8-c1a1437eb067">方案制作与报规</h3>
+     <p data-ink-id="ink-01a17c9b-d1dc-7aca-aaa7-bd5cc213a6a0">参与比稿，依据客户需求与市场偏向制作图文、绘制方案、把控效果图，编写方案报规文本与汇报文本。</p>
+    </div>
+   </li>
+   <li data-ink-id="ink-01a17c9b-d1dc-7e78-9812-6cb79a523de2">
+    <div class="no" data-ink-id="ink-01a17c9b-d1dc-7a3a-9038-e388f890751e">04</div>
+    <div data-ink-id="ink-01a17c9b-d1dc-749f-b248-af93274cea0f">
+     <h3 data-ink-id="ink-01a17c9b-d1dc-7e6a-930b-1f64faccdac0">展示与汇报</h3>
+     <p data-ink-id="ink-01a17c9b-d1dc-7576-bc74-563406930cbb">完成方案展示与汇报，把设计逻辑讲清楚，让专业判断被客户与评审理解。</p>
+    </div>
+   </li>
+   <li data-ink-id="ink-01a17c9b-d1dc-7b9c-8386-3f47db135f6e">
+    <div class="no" data-ink-id="ink-01a17c9b-d1dc-71bd-8b28-3067c970e808">05</div>
+    <div data-ink-id="ink-01a17c9b-d1dc-7f89-a552-4a66f6887800">
+     <h3 data-ink-id="ink-01a17c9b-d1dc-704e-bf92-b6f9472aa76e">落地跟踪</h3>
+     <p data-ink-id="ink-01a17c9b-d1dc-73c4-ac3e-dee9db3404d9">跟踪项目进度及后期现场服务，与团队保持良好沟通，与甲方同步进度，与施工方保持技术方案一致，确保项目平稳落地。</p>
+    </div>
+   </li>
+  </ul>
+ </div>
+ <div class="slide-foot" data-ink-id="ink-01a17c9b-d1dc-74a0-adc3-b132953e49b4">
+  <span data-ink-id="ink-01a17c9b-d1dc-7c0a-b788-c1560d1c8692">ALIN · 简历与作品集</span><span data-ink-id="ink-01a17c9b-d1dc-7d45-9507-22a1101f16a4">06 / 09</span>
+ </div>
+</section>
+<section class="slide" data-ink-id="ink-01a17c9b-d1dc-7bca-aced-9b224d3197f7">
+ <div class="wrap" data-ink-id="ink-01a17c9b-d1dc-733c-b208-a0622e4f144a">
+  <div class="eyebrow" data-ink-id="ink-01a17c9b-d1dc-7164-8caa-e5e7b3b3466a">Experience 04 · 早期经历</div>
+  <div class="job-head" data-ink-id="ink-01a17c9b-d1dc-7b16-b6c8-1177237acdb0">
+   <div class="job-role" data-ink-id="ink-01a17c9b-d1dc-7d0a-8476-785d53f68ab7">其他设计职位</div>
+   <div class="job-org" data-ink-id="ink-01a17c9b-d1dc-7caa-aac8-8e7f22c21de1">河南尚兰园林景观设计有限公司</div>
+   <div class="job-time" data-ink-id="ink-01a17c9b-d1dc-73e9-8d2f-683d4be94963">2015.09 — 2019.07</div>
+  </div>
+  <ul class="points" data-ink-id="ink-01a17c9b-d1dc-7bd2-a291-4fb4a8a84221">
+   <li data-ink-id="ink-01a17c9b-d1dc-790f-a1f2-8023b96bd9dd">
+    <div class="no" data-ink-id="ink-01a17c9b-d1dc-7515-a875-1de414d8e470">01</div>
+    <div data-ink-id="ink-01a17c9b-d1dc-769e-82de-583cc80bf1c4">
+     <h3 data-ink-id="ink-01a17c9b-d1dc-7eae-92ce-8b3664a92373">需求对接</h3>
+     <p data-ink-id="ink-01a17c9b-d1dc-7631-869d-3a34ee24342d">根据甲方需求提出解决方案，确定方案内容与呈现方向。</p>
+    </div>
+   </li>
+   <li data-ink-id="ink-01a17c9b-d1dc-7d08-8382-9dea87170aa2">
+    <div class="no" data-ink-id="ink-01a17c9b-d1dc-7131-99dc-2fdba59d38d7">02</div>
+    <div data-ink-id="ink-01a17c9b-d1dc-7e48-ae58-1e1b10a660a2">
+     <h3 data-ink-id="ink-01a17c9b-d1dc-72cb-b66a-d8ba396574ed">设计与交付</h3>
+     <p data-ink-id="ink-01a17c9b-d1dc-783e-8687-affff5f895fd">突出项目亮点，撰写项目的文字内容，完成设计创意并交付图纸等成果。</p>
+    </div>
+   </li>
+   <li data-ink-id="ink-01a17c9b-d1dc-7e77-a368-22d80ebcde1c">
+    <div class="no" data-ink-id="ink-01a17c9b-d1dc-73e1-aceb-f442d88cde7f">03</div>
+    <div data-ink-id="ink-01a17c9b-d1dc-70d8-b2be-29b9e814fb28">
+     <h3 data-ink-id="ink-01a17c9b-d1dc-7d3b-b8ce-d64497897343">后期服务</h3>
+     <p data-ink-id="ink-01a17c9b-d1dc-73e7-a381-5122b528b70f">负责后期的沟通与服务工作，跟进现场问题，维护客户关系。</p>
+    </div>
+   </li>
+  </ul>
+  <p class="lead" data-ink-id="ink-01a17c9b-d1dc-7531-913e-b0a6b7b5902a">八年设计行业的积累，从方案设计、报规文本到现场服务，完整走过项目全周期；2024 年起把这份对设计的理解，转向品牌传播与内容策划。</p>
+ </div>
+ <div class="slide-foot" data-ink-id="ink-01a17c9b-d1dc-71d3-ba2f-319be2a8f205">
+  <span data-ink-id="ink-01a17c9b-d1dc-7964-b476-8f6fe72ef57d">ALIN · 简历与作品集</span><span data-ink-id="ink-01a17c9b-d1dc-71f2-a740-40f9f6177c57">07 / 09</span>
+ </div>
+</section>
+<section class="slide" data-ink-id="ink-01a17c9b-d1dc-7c95-9ed5-69cbee91bf24">
+ <div class="wrap" data-ink-id="ink-01a17c9b-d1dc-7573-b7bf-dec687fdbf11">
+  <div class="eyebrow" data-ink-id="ink-01a17c9b-d1dc-7bbe-8af3-548ce54818a7">Background · 教育与技能</div>
+  <h2 data-ink-id="ink-01a17c9b-d1dc-7007-9a0c-81c9c6cd8ae6">艺术设计的底子，
+   <br>
+   支撑内容与视觉的判断。</h2>
+  <div class="duo" data-ink-id="ink-01a17c9b-d1dc-787d-87db-31d4d1641b52">
+   <div data-ink-id="ink-01a17c9b-d1dc-7427-a746-273880c880a4">
+    <div class="eyebrow" style="margin-top: 34px;" data-ink-id="ink-01a17c9b-d1dc-7abd-a62a-5be5196a75a3">Education · 教育经历</div>
+    <div class="duo-title" data-ink-id="ink-01a17c9b-d1dc-7a7d-ba4e-c507a2b9ff5c">河南理工大学</div>
+    <p class="duo-meta" data-ink-id="ink-01a17c9b-d1dc-798a-a351-ea6a8844be6e">本科 · 艺术设计 · 2011 — 2015</p>
+    <p class="lead" style="margin-top: 14px;" data-ink-id="ink-01a17c9b-d1dc-7932-95e0-ac0a0b64ec14">系统的艺术设计训练，打下滑动于形式、结构与版式之间的基本功，也形成了对视觉秩序的敏感度。</p>
+   </div>
+   <div data-ink-id="ink-01a17c9b-d1dc-7865-a375-cbe28897d9ef">
+    <div class="eyebrow" style="margin-top: 34px;" data-ink-id="ink-01a17c9b-d1dc-7534-967b-1d002e7d9966">Skills · 专业技能</div>
+    <div class="tags" data-ink-id="ink-01a17c9b-d1dc-7bff-be07-182318a1b54d">
+     <span class="tag" data-ink-id="ink-01a17c9b-d1dc-7744-a609-d29dbdaf5d13">Word</span> <span class="tag" data-ink-id="ink-01a17c9b-d1dc-797f-8256-e22e737e0f8a">Excel</span> <span class="tag" data-ink-id="ink-01a17c9b-d1dc-7123-995f-dde9ad27471b">PPT</span> <span class="tag" data-ink-id="ink-01a17c9b-d1dc-77cc-a398-97133c53ec32">剪映</span> <span class="tag" data-ink-id="ink-01a17c9b-d1dc-77af-afad-a32039ab219d">Photoshop</span> <span class="tag" data-ink-id="ink-01a17c9b-d1dc-7226-834d-52683e613ba0">AutoCAD</span> <span class="tag" data-ink-id="ink-01a17c9b-d1dc-7465-97f9-5f7070fccbc9">InDesign</span> <span class="tag" data-ink-id="ink-01a17c9b-d1dc-718f-a77e-c5743babdd07">SketchUp</span> <span class="tag" data-ink-id="ink-01a17c9b-d1dc-75a5-ab96-25295f757533">Lumion</span> <span class="tag" data-ink-id="ink-01a17c9b-d1dc-7ed0-ba05-a7178c8382d6">公众号排版</span> <span class="tag" data-ink-id="ink-01a17c9b-d1dc-75b1-8491-7e7a73668f4d">选题策划</span> <span class="tag" data-ink-id="ink-01a17c9b-d1dc-784f-8676-8c28d06339e4">文案撰写</span>
+    </div>
+    <p class="lead" style="margin-top: 18px;" data-ink-id="ink-01a17c9b-d1dc-7da5-a7fa-55506ace4e20">办公软件支撑日常协作与汇报交付；设计与剪辑工具支撑图文、影片等品牌内容的自主制作。</p>
+   </div>
+  </div>
+ </div>
+ <div class="slide-foot" data-ink-id="ink-01a17c9b-d1dc-7b25-91b6-3df3074616a5">
+  <span data-ink-id="ink-01a17c9b-d1dc-7692-a3ab-34fb12a9edae">ALIN · 简历与作品集</span><span data-ink-id="ink-01a17c9b-d1dc-7abb-b809-7d616fc472a1">08 / 09</span>
+ </div>
+</section>
+<section class="slide" data-ink-id="ink-01a17c9b-d1dc-7cf6-b252-2dfbe58cc9bf">
+ <div class="wrap" data-ink-id="ink-01a17c9b-d1dc-7442-afdf-d986434428e7">
+  <div class="eyebrow" data-ink-id="ink-01a17c9b-d1dc-751c-ae23-cb1a8b72ce2f">Closing · 联系方式</div>
+  <h2 class="closing-title" data-ink-id="ink-01a17c9b-d1dc-710c-a357-a3b6f8bd70f5">期待与你共事。</h2>
+  <p class="lead" data-ink-id="ink-01a17c9b-d1dc-74f1-a3ac-daff2a9ddba8">求职意向：新媒体运营 ｜ 期望城市：上海。作品集与项目案例可随时提供，欢迎进一步沟通。</p>
+  <div class="chips" data-ink-id="ink-01a17c9b-d1dc-76fc-8633-277df7c37ff0">
+   <span class="chip hot" data-ink-id="ink-01a17c9b-d1dc-7b98-92c5-ce0c3ab95f4b">新媒体运营 · 上海</span> <span class="chip" data-ink-id="ink-01a17c9b-d1dc-777a-b108-5de5c6f86ad0">电话 137XXXXXXX1</span> <span class="chip" data-ink-id="ink-01a17c9b-d1dc-797e-947b-e1d8f6c3c775">微信 x0</span> <span class="chip" data-ink-id="ink-01a17c9b-d1dc-76ad-b2dc-d4dc0919be38">邮箱 2@qq.com</span>
+  </div>
+ </div>
+ <div class="slide-foot" data-ink-id="ink-01a17c9b-d1dc-7447-b930-0b5bf994373a">
+  <span data-ink-id="ink-01a17c9b-d1dc-7393-9aaf-dc77a255402f">ALIN · 简历与作品集</span><span data-ink-id="ink-01a17c9b-d1dc-7192-afec-bcefd84bf5df">09 / 09</span>
+ </div>
+</section></body></html>
